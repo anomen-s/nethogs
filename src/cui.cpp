@@ -45,6 +45,7 @@ extern Process *unknownip;
 extern bool sortRecv;
 
 extern int viewMode;
+extern bool showcommandline;
 
 extern unsigned refreshlimit;
 extern unsigned refreshcount;
@@ -64,11 +65,12 @@ const char *COLUMN_FORMAT_RECEIVED = "%11.3f";
 
 class Line {
 public:
-  Line(const char *name, double n_recv_value, double n_sent_value, pid_t pid,
+  Line(const char *name, const char *cmdline,  double n_recv_value, double n_sent_value, pid_t pid,
        uid_t uid, const char *n_devicename) {
     assert(pid >= 0);
     assert(pid <= PID_MAX);
     m_name = name;
+    m_cmdline = cmdline;
     sent_value = n_sent_value;
     recv_value = n_recv_value;
     devicename = n_devicename;
@@ -85,6 +87,7 @@ public:
 
 private:
   const char *m_name;
+  const char *m_cmdline;
   const char *devicename;
   pid_t m_pid;
   uid_t m_uid;
@@ -152,6 +155,29 @@ static void mvaddstr_truncate_trailing(int row, int col, const char *str,
   }
 }
 
+static void mvaddstr_truncate_cmdline(int row, int col, const char *cmd,
+                                      const char *cmdline,
+                                      std::size_t max_len) {
+  if (strlen(cmd) < max_len) {
+    mvaddstr(row, col, cmd);
+  } else if (showcommandline) {
+	*str = 'x';
+	char *progname_end = strstr(str, " ");
+	if (progname_end) {
+	  *progname_end = '\000';
+	}
+	if (strlen(str) >= max_len) {
+	    mvaddstr(row, col, "..");
+	    addnstr(str + 2, max_len - 2);
+	} else {
+	    mvaddstr(row, col, str);
+	}
+  } else {
+	    mvaddstr(row, col, "..");
+	    addnstr(str + 2, max_len - 2);
+  }
+}
+
 void Line::show(int row, unsigned int proglen) {
   assert(m_pid >= 0);
   assert(m_pid <= PID_MAX);
@@ -175,7 +201,8 @@ void Line::show(int row, unsigned int proglen) {
   mvaddstr_truncate_trailing(row, column_offset_user, username.c_str(),
                              username.size(), COLUMN_WIDTH_USER);
 
-  mvaddstr_truncate_leading(row, column_offset_program, m_name, strlen(m_name),
+  // fixme
+  mvaddstr_truncate_cmdline(row, column_offset_program, m_name, m_cmdline,
                             proglen);
 
   mvaddstr(row, column_offset_dev, devicename);
@@ -195,7 +222,7 @@ void Line::show(int row, unsigned int proglen) {
 }
 
 void Line::log() {
-  std::cout << m_name << '/' << m_pid << '/' << m_uid << "\t" << sent_value
+  std::cout << m_name << '/' << m_cmdline << '/' << m_pid << '/' << m_uid << "\t" << sent_value
             << "\t" << recv_value << std::endl;
 }
 
@@ -257,6 +284,10 @@ void ui_tick() {
   case 'r':
     /* sort on 'received' */
     sortRecv = true;
+    break;
+  case 'l':
+    /* show cmdline' */
+    showcommandline = !showcommandline;
     break;
   case 'm':
     /* switch mode: total vs kb/s */
@@ -387,7 +418,7 @@ void do_refresh() {
     assert(n < nproc);
 
     lines[n] =
-      new Line(curproc->getVal()->name, value_recv, value_sent,
+      new Line(curproc->getVal()->name, curproc->getVal()->cmdline, value_recv, value_sent,
                curproc->getVal()->pid, uid, curproc->getVal()->devicename);
     curproc = curproc->next;
     n++;
