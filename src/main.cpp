@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
       break;
     case 'l':
       showcommandline = true;
-      exit;
+      break;
     case 'a':
       all = true;
       break;

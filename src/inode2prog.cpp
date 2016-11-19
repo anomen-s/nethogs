@@ -125,16 +125,15 @@ std::string getcmdline(pid_t pid) {
   bool replace_null = false;
   std::string cmdline = read_file(filename);
   
-     // join parameters, keep prgname separate, don't overwrite trailing null
-      for (int idx = 0; idx < (cmdline.length()-1); idx++) {
-        if (cmdline[idx] == 0x00) {
-         if (replace_null) {
-           cmdline[idx] = ' ';
-         }
-         replace_null = true;
-        }
-      }
+  // join parameters, keep prgname separate, don't overwrite trailing null
+  for (int idx = 0; idx < (cmdline.length()-1); idx++) {
+    if (cmdline[idx] == 0x00) {
+     if (replace_null) {
+       cmdline[idx] = ' ';
+     }
+     replace_null = true;
     }
+  }
 
   return cmdline;
 }

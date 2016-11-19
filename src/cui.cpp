@@ -155,26 +155,31 @@ static void mvaddstr_truncate_trailing(int row, int col, const char *str,
   }
 }
 
-static void mvaddstr_truncate_cmdline(int row, int col, const char *cmd,
+static void mvaddstr_truncate_cmdline(int row, int col, const char *progname,
                                       const char *cmdline,
                                       std::size_t max_len) {
-  if (strlen(cmd) < max_len) {
-    mvaddstr(row, col, cmd);
-  } else if (showcommandline) {
-	*str = 'x';
-	char *progname_end = strstr(str, " ");
-	if (progname_end) {
-	  *progname_end = '\000';
-	}
-	if (strlen(str) >= max_len) {
-	    mvaddstr(row, col, "..");
-	    addnstr(str + 2, max_len - 2);
-	} else {
-	    mvaddstr(row, col, str);
-	}
+  std::size_t proglen = strlen(progname);
+  std::size_t max_cmdlen;
+
+  if (proglen > max_len) {
+    mvaddnstr(row, col, progname, max_len - 2);
+    addstr("..");
+    max_cmdlen = 0;
   } else {
-	    mvaddstr(row, col, "..");
-	    addnstr(str + 2, max_len - 2);
+    mvaddstr(row, col, progname);
+    max_cmdlen = max_len - proglen - 1;
+  }
+
+  if (showcommandline && (max_cmdlen >= 3)) {
+
+    std::size_t cmdlinelen = strlen(cmdline);
+
+    if ((cmdlinelen + 1) > max_cmdlen) {
+      mvaddnstr(row, col + proglen + 1, cmdline, max_cmdlen - 3);
+      addstr("..");
+    } else {
+      mvaddstr(row, col + proglen + 1, cmdline);
+    }
   }
 }
 
@@ -201,7 +206,6 @@ void Line::show(int row, unsigned int proglen) {
   mvaddstr_truncate_trailing(row, column_offset_user, username.c_str(),
                              username.size(), COLUMN_WIDTH_USER);
 
-  // fixme
   mvaddstr_truncate_cmdline(row, column_offset_program, m_name, m_cmdline,
                             proglen);
 
