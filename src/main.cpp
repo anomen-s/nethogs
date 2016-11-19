@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
   bool all = false;
 
   int opt;
-  while ((opt = getopt(argc, argv, "Vahbtpd:v:c:sla")) != -1) {
+  while ((opt = getopt(argc, argv, "Vahbtpd:v:c:sl")) != -1) {
     switch (opt) {
     case 'V':
       versiondisplay();
