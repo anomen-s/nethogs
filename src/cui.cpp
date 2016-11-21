@@ -170,7 +170,7 @@ static void mvaddstr_truncate_cmdline(int row, int col, const char *progname,
     max_cmdlen = max_len - proglen - 1;
   }
 
-  if (showcommandline && (max_cmdlen >= 3)) {
+  if (showcommandline && cmdline && (max_cmdlen >= 3)) {
 
     std::size_t cmdlinelen = strlen(cmdline);
 
