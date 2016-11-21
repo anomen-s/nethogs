@@ -135,6 +135,8 @@ std::string getcmdline(pid_t pid) {
     }
   }
 
+//  cmdline.append("\0");
+
   return cmdline;
 }
 

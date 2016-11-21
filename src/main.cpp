@@ -27,7 +27,7 @@ static void help(bool iserror) {
   // output << "usage: nethogs [-V] [-b] [-d seconds] [-t] [-p] [-f (eth|ppp))]
   // [device [device [device ...]]]\n";
   output << "usage: nethogs [-V] [-h] [-b] [-d seconds] [-v mode] [-c count] "
-            "[-t] [-p] [-s] [-l] [-a] [device [device [device ...]]]\n";
+            "[-t] [-p] [-s] [-l] [device [device [device ...]]]\n";
   output << "		-V : prints version.\n";
   output << "		-h : prints this help.\n";
   output << "		-b : bughunt mode - implies tracemode.\n";
