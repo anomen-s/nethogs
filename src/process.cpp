@@ -226,7 +226,7 @@ Process *getProcess(unsigned long inode, const char *devicename) {
     return proc;
 
   const char* prgname = node->cmdline.c_str();
-  const char* cmdline = &prgname[strlen(prgname)+1];
+  const char* cmdline = prgname + strlen(prgname) + 1;
   
   Process *newproc = new Process(inode, devicename, prgname, cmdline);
   newproc->pid = node->pid;

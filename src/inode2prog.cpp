@@ -135,7 +135,10 @@ std::string getcmdline(pid_t pid) {
     }
   }
 
-//  cmdline.append("\0");
+  if (cmdline.length() == 0 || (cmdline[cmdline.length()-1] != 0x00)) {
+     // invalid content of cmdline file. Add null char to allow further processing.
+     cmdline.append("\0");
+  }
 
   return cmdline;
 }
